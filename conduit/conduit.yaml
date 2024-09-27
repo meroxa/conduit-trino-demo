@@ -7,7 +7,7 @@ grpc:
 db:
   type: sqlite
 log:
-  level: WARN
+  level: WARN 
 pipelines:
   path: ./pipelines
   exit-on-error: true

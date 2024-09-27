@@ -8,8 +8,8 @@ services:
       - CLICKHOUSE_PASSWORD=sensors_password
       - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
     ports:
-      - '18123:8123'
-      - '19000:9000'
+      - 18123:8123
+      - 19000:9000
     ulimits:
       nofile:
         soft: 262144
@@ -21,7 +21,7 @@ services:
     image: 'trinodb/trino:latest'
     hostname: trino
     ports:
-      - '10080:10080'
+      - 10080:10080
     volumes:
       - ./trino/etc:/etc/trino
     networks:

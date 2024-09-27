@@ -15,8 +15,8 @@ pipelines:
         plugin: builtin:generator
         settings:
           rate: 1
-          recordCount: 10
-          burst.generateTime: 1s
+          recordCount: 1000
+          burst.generateTime: 5s
           burst.sleepTime: 1s
           format.type: structured
           format.options.id: int
@@ -51,8 +51,8 @@ pipelines:
         plugin: builtin:generator
         settings:
           rate: 1
-          recordCount: 10
-          burst.generateTime: 1s
+          recordCount: 1000
+          burst.generateTime: 7s
           burst.sleepTime: 1s
           format.type: structured
           format.options.id: int
