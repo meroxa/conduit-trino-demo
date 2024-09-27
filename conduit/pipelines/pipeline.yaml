@@ -1,0 +1,74 @@
+version: 2.2
+pipelines:
+  - id: sensor1-to-kafka
+    status: running
+    processors:
+      - id: avro.encode
+        plugin: avro.encode
+        settings:
+          field: ".Payload.After"
+          schema.autoRegister.subject: sensors1-value
+          schema.strategy: "autoRegister"
+    connectors:
+      - id: sensors.gen
+        type: source
+        plugin: builtin:generator
+        settings:
+          rate: 1
+          recordCount: 10
+          burst.generateTime: 1s
+          burst.sleepTime: 1s
+          format.type: structured
+          format.options.id: int
+          format.options.sensor_name: string
+          format.options.active: bool
+          operations: create,update
+          sdk.schema.extract.payload.enabled: false
+          sdk.schema.extract.key.enabled: false
+      - id: kafka.out
+        type: destination
+        plugin: builtin:kafka
+        settings:
+          servers: 127.0.0.1:19092
+          topic: sensors1
+          compression: none
+          sdk.schema.extract.payload.enabled: false
+          sdk.schema.extract.key.enabled: false
+          sdk.record.format: template
+          sdk.record.format.options: '{{ .Payload.After.Bytes | toString }}'
+  - id: sensor2-to-kafka
+    status: running
+    processors:
+      - id: avro.encode
+        plugin: avro.encode
+        settings:
+          field: ".Payload.After"
+          schema.autoRegister.subject: sensors2-value
+          schema.strategy: "autoRegister"
+    connectors:
+      - id: sensors.gen
+        type: source
+        plugin: builtin:generator
+        settings:
+          rate: 1
+          recordCount: 10
+          burst.generateTime: 1s
+          burst.sleepTime: 1s
+          format.type: structured
+          format.options.id: int
+          format.options.sensor_name: string
+          format.options.active: bool
+          operations: create,update
+          sdk.schema.extract.payload.enabled: false
+          sdk.schema.extract.key.enabled: false
+      - id: kafka.out
+        type: destination
+        plugin: builtin:kafka
+        settings:
+          servers: 127.0.0.1:19092
+          topic: sensors2
+          compression: none
+          sdk.schema.extract.payload.enabled: false
+          sdk.schema.extract.key.enabled: false
+          sdk.record.format: template
+          sdk.record.format.options: '{{ .Payload.After.Bytes | toString }}'

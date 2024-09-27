@@ -1,0 +1,17 @@
+api:
+  enabled: false
+http:
+  address: :8088
+grpc:
+  address: :8089
+db:
+  type: sqlite
+log:
+  level: WARN
+pipelines:
+  path: ./pipelines
+  exit-on-error: true
+schema-registry:
+  type: confluent
+  confluent:
+    connection-string: http://localhost:8080/apis/ccompat/v7

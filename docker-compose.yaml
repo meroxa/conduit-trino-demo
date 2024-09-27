@@ -1,0 +1,61 @@
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server
+    hostname: clickhouse
+    environment:
+      - CLICKHOUSE_DB=sensors
+      - CLICKHOUSE_USER=sensors_user
+      - CLICKHOUSE_PASSWORD=sensors_password
+      - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
+    ports:
+      - '18123:8123'
+      - '19000:9000'
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    networks:
+      - kafka_network
+
+  trino:
+    image: 'trinodb/trino:latest'
+    hostname: trino
+    ports:
+      - '10080:10080'
+    volumes:
+      - ./trino/etc:/etc/trino
+    networks:
+      - kafka_network
+
+  kafka:
+    image: docker.io/bitnami/kafka:3.5
+    environment:
+      - KAFKA_ENABLE_KRAFT=yes
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:19092,CONTROLLER://:2181,DOCKER://kafka:9092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,DOCKER:PLAINTEXT
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:19092,DOCKER://kafka:9092
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@127.0.0.1:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_MESSAGE_MAX_BYTES=1048588
+    ports:
+      - 19092:19092
+      - 2181:2181
+    networks:
+      - kafka_network
+
+  registry:
+    image: apicurio/apicurio-registry-kafkasql:2.6.4.Final
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    ports:
+      - 8080:8080
+    networks:
+      - kafka_network
+
+networks:
+  kafka_network:
+    driver: bridge
